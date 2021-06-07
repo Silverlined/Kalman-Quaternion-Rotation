@@ -1,12 +1,25 @@
 import numpy as np
 from scipy.constants import g
 
+# Rotation sequence -> XYZ
+# roll -> phi
+# pitch -> theta
+# yaw -> omega
 
 def accelerometer_to_attitude(accelerometer_x, accelerometer_y, accelerometer_z):
     """Calculate roll and pitch angles from normalized (calibrated, filtered) accelerometer readings. (Measurement for Kalman) """
 
+    # This part is tricky.
+    # Assuming the object is hovering, you could use the following equations.
     roll = np.arcsin(accelerometer_x / g)
     pitch = -np.arcsin(accelerometer_y / (g * np.cos(roll)))
+    #print("CH:", roll, pitch)
+
+    # mu = 0.001
+    # pitch = np.arctan2(-accelerometer_x, np.sqrt(accelerometer_y**2 + accelerometer_z**2))
+    # roll = np.arctan2(accelerometer_y, np.sign(accelerometer_z) * np.sqrt(accelerometer_z**2 + mu * accelerometer_x**2))
+    # print("NXP:", roll, pitch)
+
     yaw = 0
 
     return roll, pitch, yaw
@@ -48,8 +61,8 @@ def gyro_transition_matrix(gyro_phi, gyro_theta, gyro_omega, delta_t):
     )
     return A
 
-
 def normalize_quaternion(q_1, q_2, q_3, q_4):
+    """Normalize a quaternion to get a unit length (important for rotations)"""
 
     norm = np.sqrt(q_1 ** 2 + q_2 ** 2 + q_3 ** 2 +  q_4 ** 2)
 

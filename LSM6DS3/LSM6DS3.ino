@@ -3,7 +3,7 @@
 
 LSM6DS3 imu_sensor( I2C_MODE, 0x6B );
 
-const float GYRO_CALIBRATION[3] = {0.14, -0.05, -0.17};
+const float GYRO_CALIBRATION[3] = {0.12, -0.06, -0.15};
 const float ACCEL_CALIBRATION[3] = {0.002, 0.004, 0.123};
 
 uint16_t init_time;

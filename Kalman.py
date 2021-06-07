@@ -10,11 +10,6 @@ from numpy.linalg import inv as inverse
 # Q -> covariance of the process noise;
 # R -> covariance of the observation noise;
 # K -> kalman gain;
-
-# Rotation sequence -> XYZ
-# roll -> phi
-# pitch -> theta
-# yaw -> omega
 """
 
 class KalmanFilter:

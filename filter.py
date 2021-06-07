@@ -4,30 +4,24 @@ def applyLowPass(buffers, value):
     """
     Description
     -----------
-    Function applies a 4th order low pass IIR filter on the input data.
+    Apply a 4th order low pass IIR filter.
     The filter cutoff frequency is 2 Hz.
-    The filter equation makes use of 3 previous input and output values,
-    which are passed into the function as lists.
+    The difference equation requires the past 3 previous input/output values.
     
     Parameters
     ----------
+    buffers: list
+        A list of 6 previous sensor readings (3 input + 3 output)
+        Used in the filter equation to compute the output at time k.
     value : float
         Accelerometer or Gyroscope reading obtained from the sensor.
-    in_buffer : list
-        A list of 3 previous sensor readings. 
-        Used in the filter equation to compute the output at time k.
-    out_buffer : list
-        A list of 3 previous filter outputs. 
-        Used in the filter equation to compute the output at time k.
 
     Returns
     -------
+    buffers: list
+        Update list of the previous input/output values.
     value : float
         Returns the calculated filter output.
-    in_buffer : list
-        Returns a list of updated previous input values.
-    out_buffer : list
-        Returns a list of updated previous filter output values.
     
     """
     in_buffer = buffers[0:3]

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import numpy as np
 import pandas as pd
 from Kalman import KalmanFilter
@@ -11,6 +13,7 @@ import socket
 UDP_IP = "127.0.0.1"
 UDP_PORT = 5005
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+SEND = False
 
 # Config
 PORT = "/dev/ttyACM0"
@@ -19,6 +22,7 @@ BAUD_RATE = 115200
 TIME_STEP = 0.01
 
 delta_t = 0.01  # Time step [s], 100Hz
+PLOT = False
 
 # Initialize covariance matrices
 Q = np.array([[10 ** -4, 0, 0, 0],
@@ -57,8 +61,9 @@ def getData():
 
 
 def main():
+    global SEND, PLOT
+
     x0 = np.array(euler_to_quaternion(0,0,0))
-    df = pd.read_excel("data/KF_data_2.xlsx", engine="openpyxl")
     F = np.identity(4)
     H = np.identity(4)
     P = np.eye(4)
@@ -66,25 +71,28 @@ def main():
     kalman = KalmanFilter(x0, F, H, P, Q, R)
 
     # Collect Data
-    accelerometer_data = np.array([df["Accel X"], df["Accel Y"], df["Accel Z"]], ndmin=2).transpose()
-    gyro_data = np.array([(df["Gyro Phi"]), (df["Gyro Theta"]), (df["Gyro Omega"])], ndmin=2).transpose()
+    # df = pd.read_excel("data/simulated_data.xlsx", engine="openpyxl")
+    # accelerometer_data = np.array([df["Accel X"], df["Accel Y"], df["Accel Z"]], ndmin=2).transpose()
+    # gyro_data = np.array([(df["Gyro Phi"]), (df["Gyro Theta"]), (df["Gyro Omega"])], ndmin=2).transpose()
 
     time = np.linspace(0, 200.1, num=20001)
     kalman_corrected_phi = []
     kalman_corrected_theta = []
     kalman_corrected_omega = []
     i = 0
+
     buffers_accel = np.zeros((3,6))
     buffers_gyros = np.zeros((3,6))
     buffers = np.zeros((6,6))
 
     while(1):
     # for accelerometer_measurement, gyro_measurement in zip(accelerometer_data, gyro_data):
+        # accelerometer_measurement = data[0:3] 
+        # gyro_measurement = data[3:6]
+
         data = getData()
         if data is not None:
         
-            # accelerometer_measurement = data[0:3] 
-            # gyro_measurement = data[3:6]
             filtered_data = np.zeros((1, 6))
 
             for index, val in enumerate(data):
@@ -106,17 +114,26 @@ def main():
 
             phi, theta, omega = quoternion_to_euler_angles(*x)
 
-            kalman_corrected_phi.append(phi)
-            kalman_corrected_theta.append(theta)
-            kalman_corrected_omega.append(omega)
+            SEND = True
 
-            message = b"y%.4fyp%.4fpr%.4fr" % (omega, theta, phi)
-            # Quaternions for the win.
-            q_message = b"w%.4fwa%.4fab%.4fbc%.4fc" % tuple(x[:])
-            sock.sendto(q_message, (UDP_IP, UDP_PORT))
-            sleep(0.003)
+            if SEND:
+                # Euler angles are okay
+                message = b"y%.4fyp%.4fpr%.4fr" % (omega, theta, phi)
 
-    def _plotData():
+                # Quaternions are better
+                q_message = b"w%.4fwa%.4fab%.4fbc%.4fc" % tuple(x[:])
+
+                sock.sendto(message, (UDP_IP, UDP_PORT))
+                sleep(0.003)
+
+            PLOT = False
+
+            if PLOT:
+                kalman_corrected_phi.append(phi)
+                kalman_corrected_theta.append(theta)
+                kalman_corrected_omega.append(omega)
+
+    if PLOT:
         dictionary = {
             "Time": time,
             "Phi": kalman_corrected_phi,
@@ -128,10 +145,6 @@ def main():
         kalman_data.plot(x="Time", y=["Theta"])
         kalman_data.plot(x="Time", y=["Omega"])
         plt.show()
-    
-    # _plotData()
-    
-
         
 
 if __name__ == "__main__":
