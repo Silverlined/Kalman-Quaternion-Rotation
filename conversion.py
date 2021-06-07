@@ -13,8 +13,9 @@ def accelerometer_to_attitude(accelerometer_x, accelerometer_y, accelerometer_z)
     # Assuming the object is hovering, you could use the following equations.
     roll = np.arcsin(accelerometer_x / g)
     pitch = -np.arcsin(accelerometer_y / (g * np.cos(roll)))
-    #print("CH:", roll, pitch)
+    print("CH:", roll, pitch)
 
+    # This method works if the accelerometer measures 1g when standing still 
     # mu = 0.001
     # pitch = np.arctan2(-accelerometer_x, np.sqrt(accelerometer_y**2 + accelerometer_z**2))
     # roll = np.arctan2(accelerometer_y, np.sign(accelerometer_z) * np.sqrt(accelerometer_z**2 + mu * accelerometer_x**2))
@@ -45,7 +46,10 @@ def quoternion_to_euler_angles(q_1, q_2, q_3, q_4):
     return phi, theta, omega
 
 def gyro_transition_matrix(gyro_phi, gyro_theta, gyro_omega, delta_t):
-    """Calculate state transition matrix from gyro readings. (Estimate for Kalman) """
+    """
+    Calculate state transition matrix from gyro readings. (Estimate for Kalman).
+    Quaternion Integration for Attitude Estimation.
+    """
 
     A = np.array(
         np.identity(4)

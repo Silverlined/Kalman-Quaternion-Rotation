@@ -4,7 +4,7 @@
 LSM6DS3 imu_sensor( I2C_MODE, 0x6B );
 
 const float GYRO_CALIBRATION[3] = {0.12, -0.06, -0.15};
-const float ACCEL_CALIBRATION[3] = {0.002, 0.004, 0.123};
+const float ACCEL_CALIBRATION[3] = {0.002, 0.004, 0};
 
 uint16_t init_time;
 const uint16_t TIME_STEP_MICROS = 10000; // 10 ms period -> 100 Hz sampling rate.
@@ -23,7 +23,7 @@ void setup() {
 
   // Accelerometer Config
   imu_sensor.settings.accelEnabled = 1;
-  imu_sensor.settings.accelRange = 2;      //Max G force readable.  Can be: 2, 4, 8, 16
+  imu_sensor.settings.accelRange = 16;      //Max G force readable.  Can be: 2, 4, 8, 16
   imu_sensor.settings.accelSampleRate = 104;  //Hz.  Can be: 13, 26, 52, 104, 208, 416, 833, 1666, 3332, 6664, 13330
   imu_sensor.settings.accelBandWidth = 50; //Hz.  Can be: 50, 100, 200, 400;
   imu_sensor.settings.accelFifoEnabled = 0;
@@ -38,7 +38,7 @@ void setup() {
   imu_sensor.settings.tempEnabled = 0;
 
   init_time = micros();
-  delay(500);
+  delay(1000);
 }
 
 // Spikes in IMU data can be caused by the code trying to read the sensor registers while they are being written.
