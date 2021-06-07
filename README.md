@@ -110,3 +110,5 @@ def acceleration_to_attitude(accelerometer_x, accelerometer_y, accelerometer_z):
 [Accelerometers, Tilt Sensing, NXP](https://www.nxp.com/docs/en/application-note/AN3461.pdf)
 
 [Sensor Fusion Kalman Filters, NXP](https://www.nxp.com/docs/en/application-note/AN5023.pdf)
+
+[Navigation Filter Best Practices, NASA](https://ntrs.nasa.gov/api/citations/20180003657/downloads/20180003657.pdf)
